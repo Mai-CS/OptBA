@@ -4,28 +4,19 @@ import pandas as pd
 # Load dataset
 # https://www.kaggle.com/datasets/paultimothymooney/medical-speech-transcription-and-intent
 
-# ailments_data = pd.read_csv('ailments.csv', encoding="ISO-8859-1")
+root_path = "/Users/mai/Projects/GitHub/ML701-AilmentClassification/data/"
 ailments_data = pd.read_csv(
-    "./data/aug_ailments.csv",
+    root_path + "aug_ailments.csv",
     encoding="ISO-8859-1",
 )
 
-# print(ailments_data.shape)
-
 ailments_data = ailments_data.drop_duplicates()
-# print(ailments_data.shape)
-
-# print("Missing values: ", ailments_data.isnull().sum())
-
-# ailments_data.info()
-
-# ailments_data.head()
 
 
-# Data Preprocessing
+# Text Preprocessing
 from sklearn import preprocessing
 
-# Convert labels to numbers
+# convert labels to numbers
 le = preprocessing.LabelEncoder()
 le.fit(ailments_data["prompt"])
 
@@ -47,6 +38,14 @@ nltk.download("omw-1.4")
 
 
 def text_transform(message):
+    """Tokenization and lemmatization of text
+
+    Args:
+        message (string): input text
+
+    Returns:
+        string: text after transformation
+    """
 
     # (a) change the message to lowercase
     message = message.lower()
@@ -54,7 +53,7 @@ def text_transform(message):
     # (b) tokenize the message,
     # i.e. if input = 'i am a student.'
     # then, output  = ['i', 'am', 'a', 'student', '.']
-    message = nltk.word_tokenize(message)
+    message = word_tokenize(message)
 
     # (c) remove special characters in the message
     msg_temp = []
@@ -85,15 +84,13 @@ def text_transform(message):
     return new_message
 
 
-ailments_data
 # apply the pre-processing steps via text_transform() function on text data
 ailments_data["transformed_phrase"] = ailments_data["phrase"].apply(text_transform)
 
 X = ailments_data.transformed_phrase
-# X.tail()
 
 
-# Count unique words
+# count unique words
 def counter_word(text_col):
     count = Counter()
     for text in text_col.values:
@@ -119,23 +116,22 @@ def get_max_input_length(docs):
     return max_input_length
 
 
-# Preprocessing
 from tensorflow.keras.preprocessing.text import Tokenizer
 
-# Vectorize a text corpus by turning each text into a sequence of integers
+# vectorize a text corpus by turning each text into a sequence of integers
 tokenizer = Tokenizer(num_words=num_unique_words)
 tokenizer.fit_on_texts(X)
 
-# Each word has a unique index
+# each word has a unique index
 word_index = tokenizer.word_index
 
-# Max number of words in a sequence
+# max number of words in a sequence
 max_length = get_max_input_length(X)
 print("max_length: ", max_length)
 
 
 def get_data():
-    # Split data
+    # split data
     from sklearn.model_selection import train_test_split
 
     X_train, X_test, y_train, y_test = train_test_split(
@@ -149,7 +145,7 @@ def get_data():
     val_sequences = tokenizer.texts_to_sequences(X_val)
     test_sequences = tokenizer.texts_to_sequences(X_test)
 
-    # Pad the sequences to have the same length
+    # pad the sequences to have the same length
     from tensorflow.keras.preprocessing.sequence import pad_sequences
 
     pad_X_train = pad_sequences(
@@ -161,15 +157,6 @@ def get_data():
     pad_X_test = pad_sequences(
         test_sequences, maxlen=max_length, padding="post", truncating="post"
     )
-
-    # print(pad_X_train.shape)
-    # print(y_train.shape)
-    # print(pad_X_val.shape)
-    # print(y_val.shape)
-    # print(pad_X_test.shape)
-    # print(y_test.shape)
-    # print(num_unique_words)
-    # print(max_length)
 
     return (
         pad_X_train,
