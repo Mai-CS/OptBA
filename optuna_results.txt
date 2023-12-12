@@ -1,0 +1,22 @@
+[]
+Default GPU Device: 
+True
+[name: "/device:CPU:0"
+device_type: "CPU"
+memory_limit: 268435456
+locality {
+}
+incarnation: 16452543948198328602
+xla_global_id: -1
+]
+max_length:  13
+Study statistics: 
+  Number of finished trials:  100
+  Number of pruned trials:  0
+  Number of complete trials:  100
+Best trial:
+  Value:  0.9926470518112183
+  Params: 
+    Units number: 94
+    Epochs number: 47
+Total time for Optuna:  4599.722308635712
