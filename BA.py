@@ -43,7 +43,8 @@ def generate_bee(index):
 
 def evaluate(bee):
     # train NN and calculate the accuracy
-    model = lstm_module.LSTM(num_epochs=int(bee[0]), num_units=int(bee[1]))
+    # model = lstm_module.LSTM(num_epochs=int(bee[0]), num_units=int(bee[1]))
+    model = lstm_module.cnn(num_epochs=int(bee[0]), num_units=int(bee[1]))
 
     accuracy = lstm_module.evaluate_model(model)
     bee[num] = accuracy
